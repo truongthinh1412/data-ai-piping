@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, List
 from uuid import uuid4
 from pydantic import BaseModel, Field
 from beanie import Document, init_beanie
@@ -12,6 +12,8 @@ class Lead(Document):
     last_name: Optional[str] = None
     email: Optional[str] = None
     photo_url: Optional[str] = None
+    academic_field: List[str] = []
+    company_type: Optional[str] = None
 
     class Settings:
         collection = "leads"
@@ -21,26 +23,23 @@ async def init():
     database = client["local"]
     await init_beanie(database, document_models=[Lead])
 
-async def create_lead():
+async def create_lead(first_name, last_name, email, photo_url, academic_field, company_type):
+
     lead = Lead(
-        first_name="John",
-        last_name="Doe",
-        email="john.doe@example.com"
+        first_name=first_name,
+        last_name=last_name,
+        email=email,
+        photo_url=photo_url,
+        academic_field=academic_field,
+        company_type=company_type
     )
     await lead.insert()
     print(f"Lead created with id: {lead.id}")
     return lead.id
 
-async def get_lead_by_id(lead_id: str):
+async def get_lead_email_by_id(lead_id: str):
     lead = await Lead.get(lead_id)
-    print(lead)
-    result = {
-        "first_name": lead.first_name,
-        "last_name": lead.last_name,
-        "email": lead.email,
-        "photo_url": lead.photo_url
-    }
-    return result
+    return lead.email
 
 async def update_lead_status(lead_id: str, new_status: int):
     lead = await Lead.get(lead_id)
@@ -55,14 +54,11 @@ async def delete_lead(lead_id: str):
         await lead.delete()
         print(f"Lead {lead_id} deleted")
 
-async def main():
-    await init()
-    lead_id = await create_lead()
-    print(lead_id)
-    lead = await get_lead_by_id(lead_id=lead_id)
-    print(lead["email"])
-    print(lead["photo_url"])
-    # asyncio.run(update_lead_status("some_lead_id", 1))
-    # asyncio.run(delete_lead("some_lead_id"))
+# async def main():
+#     await init()
+#     lead_id = await create_lead()
+#     print(lead_id)
+#     lead_email = await get_lead_email_by_id(lead_id=lead_id)
+#     print(lead_email)
 
-asyncio.run(main())
+# asyncio.run(main())
