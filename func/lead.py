@@ -18,6 +18,21 @@ class Lead(Document):
     class Settings:
         collection = "leads"
 
+class LeadResult():
+    
+    first_name: Optional[str] = None
+    last_name: Optional[str] = None
+    email: Optional[str] = None
+    academic_field: List[str] = []
+    company_type: Optional[str] = None
+
+    def __init__(self, firstname, lastname, email, academic_field, company_type):
+        self.firstname = firstname
+        self.lastname = lastname
+        self.email = email
+        self.academic_field = academic_field
+        self.company_type = company_type
+        
 async def init():
     client = motor.motor_asyncio.AsyncIOMotorClient("mongodb://root:example@localhost:27017/")
     database = client["local"]
@@ -37,9 +52,12 @@ async def create_lead(first_name, last_name, email, photo_url, academic_field, c
     print(f"Lead created with id: {lead.id}")
     return lead.id
 
-async def get_lead_email_by_id(lead_id: str):
+async def get_lead_by_id(lead_id: str):
     lead = await Lead.get(lead_id)
-    return lead.email
+    if not lead:
+        return None
+    lead_result = LeadResult(firstname=lead.first_name, lastname=lead.last_name, email=lead.email, academic_field=lead.academic_field, company_type=lead.company_type)
+    return lead_result
 
 async def update_lead_status(lead_id: str, new_status: int):
     lead = await Lead.get(lead_id)

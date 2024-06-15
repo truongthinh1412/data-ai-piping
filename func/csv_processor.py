@@ -10,10 +10,9 @@ def load_csv():
     mapping_ratio = missing_count / total_len
     print("missing_count : " ,  missing_count)
     print("mapping_ratio : ", mapping_ratio)
-    print(df_clean)
     return df_clean
 
-def add_csv(field_of_study, academic_field):
+def add_to_csv(field_of_study, academic_field):
     string = ",," + field_of_study + "," + academic_field
     with open("field_of_study_exercise.csv", "a") as myfile:
         myfile.write(string)
